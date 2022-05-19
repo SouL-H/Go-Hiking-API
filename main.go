@@ -19,17 +19,7 @@ func main() {
 	// 	jsonTodb.JsonToDB(k)
 	// }
 	//Route Id =>> return RotaName,Lat,Lon, 
-	// password := "secret"
-    // hash, _ := crypto.HashPassword(password) // ignore error for the sake of simplicity
 
-    // fmt.Println("Password:", password)
-    // fmt.Println("Hash:    ", hash)
-    // match := crypto.CheckPasswordHash(password, hash)
-    // fmt.Println("Match:   ", match)
-
-	
-	//database connect
-	//db.DbConnect()
 	api.ApiMain()
 
 

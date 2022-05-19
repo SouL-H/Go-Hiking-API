@@ -45,7 +45,7 @@ var coordinateArr []Coordinate
 
 var routeMark RouteMark
 var markCoordinateArr []MarkCoordinate
-
+//Returns coordinates based on route id.
 func GetRoute(routeId int) RouteCoordinate {
 	coordinateArr = nil
 	routeName = ""
@@ -77,7 +77,7 @@ func GetRoute(routeId int) RouteCoordinate {
 	return routeCoordinate
 
 }
-
+//Returns the coordinate and name of the marks on the route.
 func GetRouteMark(routeId int) RouteMark {
 	markCoordinateArr = nil
 	routeName = ""
@@ -111,7 +111,7 @@ func GetRouteMark(routeId int) RouteMark {
 	return routeMark
 
 }
-
+//A new user is created.
 func CreateUser(name, surname, mail, phone, id, pass string) bool {
 	var db *sql.DB
 	db, err := sql.Open("sqlite3", "./data/likya.db")
@@ -130,7 +130,7 @@ func CreateUser(name, surname, mail, phone, id, pass string) bool {
 
 	return true
 }
-
+//Deletes the current user.
 func DeleteUser(id, pass string) bool {
 	db, err := sql.Open("sqlite3", "./data/likya.db")
 	checkerr.CheckError(err)
@@ -164,6 +164,7 @@ func DeleteUser(id, pass string) bool {
 	db.Close()
 	return false
 }
+//Login the system.
 func Login(id, pass string) bool {
 	db, err := sql.Open("sqlite3", "./data/likya.db")
 	checkerr.CheckError(err)

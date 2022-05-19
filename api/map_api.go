@@ -15,7 +15,9 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("index"))
 }
 
+//Creates API endpoint.
 func ApiMain() {
+
 	r := mux.NewRouter()
 	r.HandleFunc("/", Index)
 	r.HandleFunc("/getInfoRoute/{id}", getInfoRoute)
@@ -26,6 +28,8 @@ func ApiMain() {
 	http.ListenAndServe(":7070", r)
 }
 
+//Transactions are made in the database with the information coming from outside.
+//Returns Json Route information back.
 func getInfoRoute(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -38,6 +42,8 @@ func getInfoRoute(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, string(j))
 }
 
+//Transactions are made in the database with the information coming from outside.
+//Returns Json Route Marks information back.
 func getInfoRouteMark(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 

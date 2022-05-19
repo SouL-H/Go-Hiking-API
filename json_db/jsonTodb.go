@@ -33,7 +33,8 @@ type RouteData struct {
 	} `json:"gpx"`
 }
 
-func insertMark(db *sql.DB, data RouteData, routeId int64) {
+//Route mark information from outside with RouteId adds it to the database.
+func insertMark(db *sql.DB, data RouteData, routeId int64) { //RouteId comes from the route table.
 	routeMark, err := db.Prepare("INSERT INTO route_mark(routeId, markName, markLat, markLon) values (?,?,?,?)")
 	checkerr.CheckError(err)
 	for _, k := range data.Route.RouteMark {
@@ -41,6 +42,8 @@ func insertMark(db *sql.DB, data RouteData, routeId int64) {
 		checkerr.CheckError(err)
 	}
 }
+
+//Route coordinate information from outside with RouteId adds it to the database.
 func insertCoordinate(db *sql.DB, data RouteData, routeId int64) {
 	routeMark, err := db.Prepare("INSERT INTO route_coordinate(lat, lon, routeId) values (?,?,?)")
 	checkerr.CheckError(err)
@@ -49,13 +52,16 @@ func insertCoordinate(db *sql.DB, data RouteData, routeId int64) {
 		checkerr.CheckError(err)
 	}
 }
+
+//The main function reads the Json document and converts it to a struct.
+//Then it adds it to the database with the appropriate functions.
 func JsonToDB(path string) {
 	fmt.Println("Json reading...")
 	jsonFile, err := os.Open(path)
 	checkerr.CheckError(err)
 	byteValue, _ := ioutil.ReadAll(jsonFile)
 	r := []byte(byteValue)
-	data := RouteData{}
+	data := RouteData{} //Data data turned into RouteData struct.
 	json.Unmarshal(r, &data)
 	fmt.Println("Json reading done...")
 	fmt.Println("DB connected...")
@@ -64,7 +70,7 @@ func JsonToDB(path string) {
 	route, err := db.Prepare("INSERT INTO route(routeName) values (?)")
 	checkerr.CheckError(err)
 
-	res1, err := route.Exec(data.Route.Metadata.Name)
+	res1, err := route.Exec(data.Route.Metadata.Name) //route name insert
 	checkerr.CheckError(err)
 	id, err := res1.LastInsertId()
 	checkerr.CheckError(err)
@@ -75,6 +81,7 @@ func JsonToDB(path string) {
 	insertCoordinate(db, data, id)
 	fmt.Println("Route Coordinate Insert")
 
+	//After the file and database process is finished, they close it last.
 	defer func() {
 		err := jsonFile.Close()
 		checkerr.CheckError(err)
