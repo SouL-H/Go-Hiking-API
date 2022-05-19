@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	//"likyaapi/api"
-	"likyaapi/db"
+
+	"likyaapi/api"
 	//jsonTodb "likyaapi/json_db"
 	"os"
 	"os/signal"
@@ -19,17 +19,12 @@ func main() {
 	// 	jsonTodb.JsonToDB(k)
 	// }
 	//Route Id =>> return RotaName,Lat,Lon, 
-	a:=db.GetRoute(7)
-	for _, k := range a{
-		fmt.Print(k.RouteName)
-	}
-	b:=db.GetRoute(9)
-	for _, k := range b{
-		fmt.Print(k.RouteName)
-	}
+
+
+	
 	//database connect
 	//db.DbConnect()
-	//api.ApiMain()
+	api.ApiMain()
 	//Program done
 
 	sigs := make(chan os.Signal, 1)

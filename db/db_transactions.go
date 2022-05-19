@@ -17,40 +17,47 @@ type User struct {
 	Password string
 }
 type RouteCoordinate struct {
-	RouteName string
-	Lat       float64
-	Lon       float64
+	RouteName     string
+	CoordinateArr []Coordinate
 }
 
-var routeCoordinateArr []RouteCoordinate
+type Coordinate struct {
+	Lat float64
+	Lon float64
+}
 
-func GetRoute(routeId int) []RouteCoordinate {
-	routeCoordinateArr = nil
+var routeCoordinate RouteCoordinate
+var routeName string
+var coordinateArr []Coordinate
+
+func GetRoute(routeId int) RouteCoordinate {
+	coordinateArr = nil
 
 	db, err := sql.Open("sqlite3", "./data/likya.db")
 	checkerr.CheckError(err)
 
-	rows, err := db.Query("SELECT route.routeName, route.routeId,route_coordinate.lat,  route_coordinate.lon FROM route_coordinate INNER JOIN route ON route.routeId = route_coordinate.routeId WHERE route.routeId=?",routeId)
+	rows, err := db.Query("SELECT route.routeName, route.routeId,route_coordinate.lat,  route_coordinate.lon FROM route_coordinate INNER JOIN route ON route.routeId = route_coordinate.routeId WHERE route.routeId=?", routeId)
 	checkerr.CheckError(err)
 	for rows.Next() {
 		var lat float64
 		var lon float64
 		var routeId int64
-		var routeName string
-		err := rows.Scan(&routeName, &routeId, &lon, &lat)
+		var _routeName string
+		err := rows.Scan(&_routeName, &routeId, &lon, &lat)
 		if err == nil {
-			routeCoordinateArr = append(routeCoordinateArr, RouteCoordinate{
-				RouteName: routeName,
-				Lat:       lat,
-				Lon:       lon,
+			coordinateArr = append(coordinateArr, Coordinate{
+				Lat: lat,
+				Lon: lon,
 			})
+			routeName = _routeName
 		}
 
 	}
+	routeCoordinate.RouteName = routeName
+	routeCoordinate.CoordinateArr = coordinateArr
 	db.Close()
-	return routeCoordinateArr
-	
-	
+	return routeCoordinate
+
 }
 
 // func tableCreate(db *sql.DB) {
