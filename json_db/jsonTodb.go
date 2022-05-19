@@ -32,28 +32,27 @@ type RouteData struct {
 		} `json:"trk"`
 	} `json:"gpx"`
 }
-func insertMark(db *sql.DB,data RouteData,routeId int64){
+
+func insertMark(db *sql.DB, data RouteData, routeId int64) {
 	routeMark, err := db.Prepare("INSERT INTO route_mark(routeId, markName, markLat, markLon) values (?,?,?,?)")
 	checkerr.CheckError(err)
-	for _ ,k := range data.Route.RouteMark{
-		_, err =routeMark.Exec(routeId,k.MarkName,k.MarkLat,k.MarkLon)
+	for _, k := range data.Route.RouteMark {
+		_, err = routeMark.Exec(routeId, k.MarkName, k.MarkLat, k.MarkLon)
 		checkerr.CheckError(err)
 	}
 }
-func insertCoordinate(db *sql.DB,data RouteData,routeId int64){
+func insertCoordinate(db *sql.DB, data RouteData, routeId int64) {
 	routeMark, err := db.Prepare("INSERT INTO route_coordinate(lat, lon, routeId) values (?,?,?)")
 	checkerr.CheckError(err)
-	for _ ,k := range data.Route.RouteCoordinate.Coordinates.CoordinateArr{
-		_, err =routeMark.Exec(k.Lat,k.Lon,routeId)
+	for _, k := range data.Route.RouteCoordinate.Coordinates.CoordinateArr {
+		_, err = routeMark.Exec(k.Lat, k.Lon, routeId)
 		checkerr.CheckError(err)
 	}
 }
 func JsonToDB(path string) {
 	fmt.Println("Json reading...")
 	jsonFile, err := os.Open(path)
-	if err != nil {
-		panic(err)
-	}
+	checkerr.CheckError(err)
 	byteValue, _ := ioutil.ReadAll(jsonFile)
 	r := []byte(byteValue)
 	data := RouteData{}
@@ -64,18 +63,17 @@ func JsonToDB(path string) {
 	db, err = sql.Open("sqlite3", "./data/likya.db")
 	route, err := db.Prepare("INSERT INTO route(routeName) values (?)")
 	checkerr.CheckError(err)
-	
+
 	res1, err := route.Exec(data.Route.Metadata.Name)
 	checkerr.CheckError(err)
-	id, err:= res1.LastInsertId()
+	id, err := res1.LastInsertId()
 	checkerr.CheckError(err)
 	fmt.Println("Route Name Insert")
 
-	insertMark(db,data,id)
+	insertMark(db, data, id)
 	fmt.Println("Route Mark Insert")
-	insertCoordinate(db,data,id)
+	insertCoordinate(db, data, id)
 	fmt.Println("Route Coordinate Insert")
-
 
 	defer func() {
 		err := jsonFile.Close()

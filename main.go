@@ -3,7 +3,8 @@ package main
 import (
 	"fmt"
 
-	"likyaapi/api"
+	//"likyaapi/api"
+	"likyaapi/crypto"
 	//jsonTodb "likyaapi/json_db"
 	"os"
 	"os/signal"
@@ -13,19 +14,20 @@ import (
 func main() {
 
 	//Json data Insert DB
-	//pathArr := []string{"./jsonData/1_fethiye_kayakoy_ovacık.json", "./jsonData/2_ovacık_kozagac_faralya.json", "./jsonData/3_faralya_kabak.json"}
+	// pathArr := []string{"./jsonData/1_fethiye_kayakoy_ovacık.json", "./jsonData/2_ovacık_kozagac_faralya.json", "./jsonData/3_faralya_kabak.json"}
 
 	// for _, k := range pathArr{
 	// 	jsonTodb.JsonToDB(k)
 	// }
 	//Route Id =>> return RotaName,Lat,Lon, 
+    password := "secret"
+    hash, _ := crypto.HashPassword(password) // ignore error for the sake of simplicity
 
-
-	
-	//database connect
-	//db.DbConnect()
-	api.ApiMain()
-	//Program done
+    fmt.Println("Password:", password)
+    fmt.Println("Hash:    ", hash)
+    match := crypto.CheckPasswordHash(password, hash)
+    fmt.Println("Match:   ", match)
+	//api.ApiMain()
 
 	sigs := make(chan os.Signal, 1)
 	done := make(chan bool)
