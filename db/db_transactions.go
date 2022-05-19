@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	checkerr "likyaapi/checkErr"
+	"likyaapi/crypto"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -111,29 +112,15 @@ func GetRouteMark(routeId int) RouteMark {
 
 }
 
-func createUser(name,surname,id,pass,mail,phone string)bool{
-	fmt.Println("Json reading...")
-	jsonFile, err := os.Open(path)
-	if err != nil {
-		panic(err)
-	}
-	byteValue, _ := ioutil.ReadAll(jsonFile)
-	r := []byte(byteValue)
-	data := RouteData{}
-	json.Unmarshal(r, &data)
-	fmt.Println("Json reading done...")
-	fmt.Println("DB connected...")
+func CreateUser(name, surname, mail, phone, id, pass string) bool {
 	var db *sql.DB
-	db, err = sql.Open("sqlite3", "./data/likya.db")
-	route, err := db.Prepare("INSERT INTO route(routeName) values (?)")
+	db, err := sql.Open("sqlite3", "./data/likya.db")
+	route, err := db.Prepare("INSERT INTO users(name,surname,mail,phone,userName,userPass) values (?,?,?,?,?,?)")
 	checkerr.CheckError(err)
-	
-	res1, err := route.Exec(data.Route.Metadata.Name)
-	checkerr.CheckError(err)
-	id, err:= res1.LastInsertId()
-	checkerr.CheckError(err)
-	fmt.Println("Route Name Insert")
+	hashPass, _ := crypto.HashPassword(pass)
 
+	_, err = route.Exec(name, surname, mail, phone, id, hashPass)
+	checkerr.CheckError(err)
 
 	defer func() {
 		err = db.Close()
@@ -142,4 +129,65 @@ func createUser(name,surname,id,pass,mail,phone string)bool{
 	}()
 
 	return true
+}
+
+func DeleteUser(id, pass string) bool {
+	db, err := sql.Open("sqlite3", "./data/likya.db")
+	checkerr.CheckError(err)
+
+	if err == nil {
+
+		rows, err := db.Query("SELECT * FROM users WHERE  userName=?", id)
+		for rows.Next() {
+			var name, surname, mail, phone, id, _pass string
+			var tid int
+
+			err := rows.Scan(&tid, &name, &surname, &mail, &phone, &id, &_pass)
+			if err == nil {
+				rows.Close()
+				hash := crypto.CheckPasswordHash(pass, _pass)
+				if hash {
+					del, err := db.Prepare("DELETE FROM users where userName=?")
+					checkerr.CheckError(err)
+
+					_, err = del.Exec(id)
+					checkerr.CheckError(err)
+					return true
+				}
+			}
+
+		}
+		checkerr.CheckError(err)
+		return false
+	}
+
+	db.Close()
+	return false
+}
+func Login(id, pass string) bool {
+	db, err := sql.Open("sqlite3", "./data/likya.db")
+	checkerr.CheckError(err)
+
+	rows, err := db.Query("SELECT * FROM users WHERE  userName=?", id)
+	for rows.Next() {
+		var name, surname, mail, phone, id, _pass string
+		var tid int
+
+		err := rows.Scan(&tid, &name, &surname, &mail, &phone, &id, &_pass)
+		if err == nil {
+			hash := crypto.CheckPasswordHash(pass, _pass)
+			if hash {
+				return true
+			}
+		}
+
+	}
+	checkerr.CheckError(err)
+
+	defer func() {
+		db.Close()
+		rows.Close()
+	}()
+
+	return false
 }
