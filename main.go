@@ -12,16 +12,15 @@ import (
 
 func main() {
 
-	//Json data Insert DB
+	// //Json data Insert DB
 	// pathArr := []string{"./jsonData/1_fethiye_kayakoy_ovacık.json", "./jsonData/2_ovacık_kozagac_faralya.json", "./jsonData/3_faralya_kabak.json"}
 
-	// for _, k := range pathArr{
+	// for _, k := range pathArr {
 	// 	jsonTodb.JsonToDB(k)
 	// }
-	//Route Id =>> return RotaName,Lat,Lon, 
+	// //Route Id =>> return RotaName,Lat,Lon,
 
 	api.ApiMain()
-
 
 	sigs := make(chan os.Signal, 1)
 	done := make(chan bool)
